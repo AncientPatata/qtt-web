@@ -23,15 +23,24 @@ import { motion } from "framer-motion";
 import { DataTable } from "../../Components/InventoryManagement/DataTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import stringMath from "string-math";
+import IncrementalStockHistory from "../../Components/InventoryManagement/IncrementalStockHistory";
 
 function AddStockForm(props) {
   const { options, ...otherProps } = props;
   const [itemName, setItemName] = useState(null);
   const [quantity, setQuantity] = useState(null);
+  const [lot, setLot] = useState(null);
+  const [expDate, setExpDate] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    AddQuantityToItem(itemName.value, itemName.label, stringMath(quantity));
+    AddQuantityToItem(
+      itemName.value,
+      itemName.label,
+      stringMath(quantity),
+      lot,
+      expDate
+    );
   };
 
   console.log(options);
@@ -91,6 +100,35 @@ function AddStockForm(props) {
             textAlign="center"
           />
         </FormControl>
+        <FormControl>
+          <FormLabel textAlign="center" fontSize="1.2em">
+            LOT
+          </FormLabel>
+          <Input
+            value={lot}
+            onChange={(e) => setLot(e.target.value)}
+            rounded="none"
+            variant="filled"
+            height="55px"
+            fontSize="2xl"
+            textAlign="center"
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel textAlign="center" fontSize="1.2em">
+            Expiration Date
+          </FormLabel>
+          <Input
+            value={expDate}
+            type="datetime-local"
+            onChange={(e) => setExpDate(e.target.value)}
+            rounded="none"
+            variant="filled"
+            height="55px"
+            fontSize="2xl"
+            textAlign="center"
+          />
+        </FormControl>
         <Button
           type="submit"
           height="50px"
@@ -102,61 +140,6 @@ function AddStockForm(props) {
         </Button>
       </Flex>
     </form>
-  );
-}
-
-const columnHelper = createColumnHelper();
-
-const columns = [
-  columnHelper.accessor("name", {
-    cell: (info) => info.getValue(),
-    header: "Name of the item",
-  }),
-  columnHelper.accessor("deltaQuantity", {
-    cell: (info) => info.getValue(),
-    header: "Extra information / notes",
-  }),
-  columnHelper.accessor(
-    (row) => new Date(row.changeTS.seconds * 1000).toUTCString(),
-    {
-      cell: (info) => info.getValue(),
-      header: "Timestamp of the change",
-      meta: {
-        isNumeric: true,
-      },
-    }
-  ),
-];
-
-function IncrementalStockHistory(props) {
-  // Only get last N items
-  const [value, loading, error] = useCollection(
-    collection(getFirestore(), "items_incremental")
-  );
-  return (
-    <motion.div
-      animate={{ y: 20 }}
-      transition={{ type: "spring", stiffness: 100 }}
-    >
-      <Flex
-        flexDir="column"
-        pl="80px"
-        pr="80px"
-        pt="80px"
-        pb="80px"
-        bgColor="rgba(0,0,0,0.1)"
-        rounded="1.2em"
-        borderWidth="1px"
-        borderColor="black"
-      >
-        {value && (
-          <DataTable
-            data={value.docs.map((doc) => doc.data())}
-            columns={columns}
-          />
-        )}
-      </Flex>
-    </motion.div>
   );
 }
 

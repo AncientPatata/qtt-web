@@ -15,6 +15,7 @@ import "@fontsource/roboto";
 import AuthorItems from "./Pages/InventoryManagement/AuthorItems";
 import NewStock from "./Pages/InventoryManagement/NewStock";
 import { useAuthState } from "react-firebase-hooks/auth";
+import RemoveStock from "./Pages/InventoryManagement/RemoveStock";
 const dashboardRouter = createBrowserRouter([
   {
     path: "/",
@@ -27,6 +28,10 @@ const dashboardRouter = createBrowserRouter([
   {
     path: "/inventory/new_stock",
     element: <NewStock />,
+  },
+  {
+    path: "/inventory/remove_stock",
+    element: <RemoveStock />,
   },
 ]);
 

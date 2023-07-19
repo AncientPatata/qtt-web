@@ -1,5 +1,13 @@
 // Import the functions you need from the SDKs you need
 
+import { createClient } from "@supabase/supabase-js";
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient(
+  "https://xyzcompany.supabase.co",
+  "public-anon-key"
+);
+
 import { initializeApp } from "firebase/app";
 import {
   CACHE_SIZE_UNLIMITED,

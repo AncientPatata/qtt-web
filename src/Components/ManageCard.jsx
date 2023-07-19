@@ -40,6 +40,7 @@ function ManageCard() {
                 bgColor="blackAlpha.100"
                 _hover={{ bgColor: "blackAlpha.300", cursor: "pointer" }}
                 align="center"
+                onClick={() => navigate("/inventory/remove_stock")}
               >
                 Remove items from inventory
               </Box>
