@@ -1,0 +1,12 @@
+create or replace function upsert_item_instance(p_item_name text, p_lot text, p_expDate timestamp, p_quantity int2)
+returns table (item_name text, lot text, expDate timestamp, quantity int2)
+language plpgsql
+as $$
+begin
+  insert into ItemInstances(item_name, lot, expDate, quantity) 
+  values(p_item_name, p_lot, p_expDate, p_quantity)
+  ON CONFLICT (item_name, lot, expDate) 
+  DO update set quantity = ItemInstances.quantity + excluded.quantity;
+  return query select * from ItemInstances where item_name=p_item_name and lot=p_lot and expDate=p_expDate;
+end;
+$$

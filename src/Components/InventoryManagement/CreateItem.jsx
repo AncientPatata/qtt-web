@@ -16,25 +16,20 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { addDoc, collection, getFirestore } from "firebase/firestore";
-import app from "../../lib/firebase";
-
+import { AddNewItem } from "../../lib/item_management";
+import useSWR from "swr";
 function CreateItemForm(props) {
-  const db = getFirestore(app);
+  const { mutate } = useSWR("Items");
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm();
-  const onSubmit = async (data) => {
-    try {
-      const docRef = await addDoc(collection(db, "items"), data);
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-    console.log(data);
+  const onSubmit = (data) => {
+    mutate(AddNewItem(data), {
+      optimisticData: (currData) => [data, ...currData],
+    });
   };
 
   return (
@@ -43,13 +38,13 @@ function CreateItemForm(props) {
         <Flex flexDir="column" gap="20px">
           <FormControl>
             <FormLabel>Item name</FormLabel>
-            <Input {...register("name", { required: true })} />
+            <Input {...register("itemName", { required: true })} />
           </FormControl>
           <FormControl>
-            <FormLabel>Item price</FormLabel>
+            <FormLabel>Unit price of item</FormLabel>
             <InputGroup>
               <Input
-                {...register("price", {
+                {...register("unitPrice", {
                   valueAsNumber: true,
                   pattern: {
                     value: /^(0|[1-9]\d*)(\.\d+)?$/,

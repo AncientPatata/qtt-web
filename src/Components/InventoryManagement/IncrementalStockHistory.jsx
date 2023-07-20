@@ -6,34 +6,44 @@ import { createColumnHelper } from "@tanstack/react-table";
 
 import { motion } from "framer-motion";
 
+import useSWR from "swr";
+import { fetch_table } from "../../lib/db_fetcher";
+import supabase from "../../lib/supabase";
 const columnHelper = createColumnHelper();
 
 const columns = [
-  columnHelper.accessor("name", {
+  columnHelper.accessor((row) => row.Items.item_name, {
     cell: (info) => info.getValue(),
     header: "Name of the item",
   }),
-  columnHelper.accessor("deltaQuantity", {
+  columnHelper.accessor("lot", {
     cell: (info) => info.getValue(),
-    header: "Extra information / notes",
+    header: "LOT",
   }),
-  columnHelper.accessor(
-    (row) => new Date(row.changeTS.seconds * 1000).toUTCString(),
-    {
-      cell: (info) => info.getValue(),
-      header: "Timestamp of the change",
-      meta: {
-        isNumeric: true,
-      },
-    }
-  ),
+  columnHelper.accessor("quantity", {
+    cell: (info) => info.getValue(),
+    header: "Updated Quantity",
+  }),
+  columnHelper.accessor((row) => row.created_at, {
+    cell: (info) => info.getValue(),
+    header: "Timestamp of the change",
+    meta: {
+      isNumeric: true,
+    },
+  }),
 ];
 
 function IncrementalStockHistory(props) {
   // Only get last N items
-  const [value, loading, error] = useCollection(
-    collection(getFirestore(), "items_incremental")
-  );
+  const { data, isLoading, error } = useSWR("ItemInstances", (table) => {
+    return supabase
+      .from(table)
+      .select("*, Items(item_name)")
+      .order("created_at", { ascending: false })
+      .limit(15)
+      .then((res) => res.data);
+  });
+  console.log("DATA-> : ", data);
   return (
     <motion.div
       animate={{ y: 20 }}
@@ -50,12 +60,7 @@ function IncrementalStockHistory(props) {
         borderWidth="1px"
         borderColor="black"
       >
-        {value && (
-          <DataTable
-            data={value.docs.map((doc) => doc.data())}
-            columns={columns}
-          />
-        )}
+        {data && <DataTable data={data} columns={columns} />}
       </Flex>
     </motion.div>
   );

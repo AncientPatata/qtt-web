@@ -9,22 +9,18 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
-import {
-  collection,
-  getDoc,
-  getFirestore,
-  updateDoc,
-} from "firebase/firestore";
+
 import { useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { useNavigate } from "react-router-dom";
-import { AddQuantityToItem } from "../../lib/item_management";
+import { InstanciateItems } from "../../lib/item_management";
 import { motion } from "framer-motion";
 import { DataTable } from "../../Components/InventoryManagement/DataTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import stringMath from "string-math";
 import IncrementalStockHistory from "../../Components/InventoryManagement/IncrementalStockHistory";
-
+import { fetch_table } from "../../lib/db_fetcher";
+import useSWR from "swr";
 function AddStockForm(props) {
   const { options, ...otherProps } = props;
   const [itemName, setItemName] = useState(null);
@@ -34,13 +30,7 @@ function AddStockForm(props) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    AddQuantityToItem(
-      itemName.value,
-      itemName.label,
-      stringMath(quantity),
-      lot,
-      expDate
-    );
+    InstanciateItems(itemName.value, stringMath(quantity), lot, expDate);
   };
 
   console.log(options);
@@ -145,10 +135,8 @@ function AddStockForm(props) {
 
 function NewStock() {
   const navigate = useNavigate();
-  const [value, loading, error] = useCollection(
-    collection(getFirestore(), "items")
-  );
-
+  const { data, error, isLoading } = useSWR("Items", fetch_table);
+  console.log("DATAT TATA", data);
   return (
     <Box h="100%" w="100vw" bg="#FFFFEE" p="50px">
       <Flex flexDir="column" gap="50px">
@@ -175,16 +163,16 @@ function NewStock() {
             Back
           </Box>
         </Flex>
-        {loading && (
+        {isLoading && (
           <Center width="100%" height="100vh">
             <Spinner />
           </Center>
         )}
-        {value && (
+        {!isLoading && data && (
           <AddStockForm
-            options={value.docs.map((doc) => {
+            options={data.map((doc) => {
               return {
-                label: doc.data()["name"],
+                label: doc["item_name"],
                 value: doc.id,
               };
             })}

@@ -3,14 +3,15 @@ import { useNavigate } from "react-router-dom";
 import CreateItem from "../../Components/InventoryManagement/CreateItem";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, getFirestore } from "firebase/firestore";
-import app from "../../lib/firebase";
+import app from "../../lib/supabase";
 import { DataTable } from "../../Components/InventoryManagement/DataTable";
 import { createColumnHelper } from "@tanstack/react-table";
-
+import useSWR from "swr";
+import { fetch_table } from "../../lib/db_fetcher";
 const columnHelper = createColumnHelper();
 
 const columns = [
-  columnHelper.accessor("name", {
+  columnHelper.accessor("item_name", {
     cell: (info) => info.getValue(),
     header: "Name of the item",
   }),
@@ -18,7 +19,7 @@ const columns = [
     cell: (info) => info.getValue(),
     header: "Extra information / notes",
   }),
-  columnHelper.accessor("price", {
+  columnHelper.accessor("unit_price", {
     cell: (info) => info.getValue(),
     header: "Price of the item",
     meta: {
@@ -30,9 +31,8 @@ const columns = [
 function AuthorItems() {
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [value, loading, error] = useCollection(
-    collection(getFirestore(app), "items")
-  );
+  const { data, error, isLoading } = useSWR("Items", fetch_table);
+  console.log(data);
   return (
     <Box w="100vw" h="100vh" bg="#FFFFEE" pt="50px" pl="25px" pr="25px">
       <Flex flexDir="column" gap="20px">
@@ -82,12 +82,7 @@ function AuthorItems() {
           bgColor={"rgba(0,0,0,0.1)"}
           gap="50px"
         >
-          {value && (
-            <DataTable
-              columns={columns}
-              data={value.docs.map((doc) => doc.data())}
-            />
-          )}
+          {!isLoading && <DataTable columns={columns} data={data} />}
         </Box>
       </Flex>
       <CreateItem isOpen={isOpen} onClose={onClose} />

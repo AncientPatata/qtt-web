@@ -1,16 +1,25 @@
 import { Box, Button, Center, Divider, Flex, Spacer } from "@chakra-ui/react";
-import { getAuth, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { UserPill } from "../Components/UserPill";
 import CriticalSupplyCard from "../Components/CriticalSupplyCard";
 import AuthorCard from "../Components/AuthorCard";
 import ManageCard from "../Components/ManageCard";
 
+import supabase from "../lib/supabase";
+import { useEffect, useState } from "react";
+
 function Dashboard() {
-  const auth = getAuth();
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data, error }) => {
+      setUser(data.session.user);
+    });
+  }, []);
+
   const navigate = useNavigate();
   const handleSignout = () => {
-    signOut(auth)
+    supabase.auth
+      .signOut()
       .then(() => {
         // Sign-out successful.
         navigate("/");
@@ -52,7 +61,7 @@ function Dashboard() {
           Sign Out
         </Box>
         <Spacer />
-        <UserPill userName={auth.currentUser.displayName} />
+        <UserPill userName={user?.email} />
       </Flex>
       <Flex
         margin="auto"

@@ -8,8 +8,8 @@ import {
   getAuth,
   onAuthStateChanged,
 } from "firebase/auth";
-import app from "./lib/firebase";
-import { useState } from "react";
+import supabase from "./lib/supabase";
+import { useEffect, useState } from "react";
 import theme from "./theme";
 import "@fontsource/roboto";
 import AuthorItems from "./Pages/InventoryManagement/AuthorItems";
@@ -36,20 +36,27 @@ const dashboardRouter = createBrowserRouter([
 ]);
 
 function App() {
-  const [user, loading, error] = useAuthState(getAuth());
+  const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data, session }) => {
+      setUser(data.session);
+    });
+    supabase.auth.onAuthStateChange((event, session) => {
+      console.log(event, session);
+      supabase.auth.getSession().then(({ data, error }) => {
+        setUser(data.session);
+      });
+    });
+  }, []);
   return (
     <ChakraProvider theme={theme}>
-      {loading && (
+      {/* {loading && (
         <Box w="100vw" h="100vh" bg="#FFFFEE">
           <Spinner position="absolute" top="50%" height="50%" color="#8093F1" />
         </Box>
-      )}
-      {!loading && user ? (
-        <RouterProvider router={dashboardRouter} />
-      ) : (
-        <LoginPage />
-      )}
+      )} */}
+      {user ? <RouterProvider router={dashboardRouter} /> : <LoginPage />}
     </ChakraProvider>
   );
 }

@@ -1,48 +1,53 @@
-import {
-  addDoc,
-  arrayRemove,
-  arrayUnion,
-  collection,
-  doc,
-  getDoc,
-  getFirestore,
-  increment,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
-import app from "./firebase";
+import supabase from "./supabase";
 
-async function AddQuantityToItem(itemId, itemName, quantity, lot, expDate) {
-  const db = getFirestore(app);
-  const itemDocRef = doc(db, "items", itemId);
-  if (!lot || lot === "") {
-    await updateDoc(itemDocRef, {
-      quantity: increment(quantity),
-      expDates: arrayUnion({ expDate: expDate, quantity: quantity }),
-    });
-  } else {
-    const lotDocRef = doc(db, "items", itemId, "lots", lot);
-    await updateDoc(itemDocRef, {
-      quantity: increment(quantity),
-    });
-    await setDoc(
-      lotDocRef,
-      {
-        quantity: increment(quantity),
-        expDates: arrayUnion({ expDate: expDate, quantity: quantity }),
-      },
-      { merge: true }
-    );
-  }
-  // If I switch to arrays inside of the items collection, there is a high risk of a performance hit... Maybe I should do one document per day and then have arrays inside that document ? I don't know...
-  const docRef = await addDoc(collection(db, "items_incremental"), {
-    itemId: itemId,
-    name: itemName,
-    lot: lot,
-    deltaQuantity: quantity,
-    changeTS: new Date(),
+async function AddNewItem({ itemName, unitPrice, ...other }) {
+  return supabase
+    .from("Items")
+    .insert({
+      item_name: itemName,
+      unit_price: unitPrice,
+    })
+    .select();
+}
+
+async function InstanciateItems(itemId, quantity, lot, expDate) {
+  console.log({
+    p_item_type: 1,
+    p_lot: lot,
+    p_expDate: new Date().toISOString(),
+    p_quantity: quantity,
   });
-  return docRef;
+  let { data: preexisting_item, error } = await supabase
+    .from("ItemInstances")
+    .select("*")
+    .eq("lot", lot)
+    .eq("expDate", expDate)
+    .eq("item_type", itemId)
+    .limit(1)
+    .single();
+  console.log("preexisting_item", preexisting_item);
+  console.log("preexisting_item_error", error);
+  let data;
+  if (preexisting_item) {
+    console.log("Item already exists, updating quantity");
+    let { resd, err } = await supabase.from("ItemInstances").update({
+      quantity: preexisting_item.quantity + quantity,
+    });
+    data = resd;
+    console.log("new_item_update_error", err);
+  } else {
+    console.log("Item doesn't already exist, inserting new item");
+    let { resd, err } = await supabase.from("ItemInstances").insert({
+      item_type: itemId,
+      expDate: expDate,
+      lot: lot,
+      quantity: quantity,
+    });
+    data = resd;
+    console.log("new_item_creation_error", err);
+  }
+  //p_item_name text, p_lot text, p_expDate timestamp, p_quantity int2)
+  return data;
 }
 
 async function ApplyQuantityModifToLot(
@@ -51,43 +56,13 @@ async function ApplyQuantityModifToLot(
   new_quantity,
   lot,
   expDate
-) {
-  const db = getFirestore(app);
-  let docRef;
-  if (lot) {
-    docRef = doc(db, "items", itemId, "lots", lot);
-    // const docData = (await getDoc(lotDocRef)).data();
-  } else {
-    docRef = doc(db, "items", itemId);
-  }
-  await updateDoc(docRef, {
-    quantity: increment(new_quantity - old_quantity),
-    expDates: arrayRemove({ expDate: expDate, quantity: old_quantity }),
-  });
-  // If new_quantity is 0, we delete the expDate element, and if no more expDate elements we delete the lot
-  if (new_quantity !== 0) {
-    await updateDoc(docRef, {
-      expDates: arrayUnion({ expDate: expDate, quantity: new_quantity }),
-    });
-  }
-}
+) {}
 
 async function ApplyQuantityModifToItem(
   itemId,
   old_quantity,
   new_quantity,
   expDate
-) {
-  const db = getFirestore(app);
-  const lotDocRef = doc(db, "items", itemId);
-  // const docData = (await getDoc(lotDocRef)).data();
-  await updateDoc(lotDocRef, {
-    expDates: arrayRemove({ expDate: expDate, quantity: old_quantity }),
-  });
-  await updateDoc(lotDocRef, {
-    quantity: increment(new_quantity - old_quantity),
-    expDates: arrayUnion({ expDate: expDate, quantity: new_quantity }),
-  });
-}
+) {}
 
-export { AddQuantityToItem, ApplyQuantityModifToLot };
+export { InstanciateItems, ApplyQuantityModifToLot, AddNewItem };

@@ -15,7 +15,7 @@ import {
   getAuth,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import app from "../lib/firebase";
+import supabase from "../lib/supabase";
 import { useState } from "react";
 
 function LoginPage() {
@@ -24,17 +24,10 @@ function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const handleLogin = (e) => {
     e.preventDefault();
-    getAuth()
-      .setPersistence(browserLocalPersistence)
-      .then(() => {
-        signInWithEmailAndPassword(getAuth(app), email, password)
-          .then((userCred) => {
-            console.log("USER CRED, ", userCred);
-          })
-          .catch((error) => {
-            console.log("ERROR : ", error);
-          });
-      });
+    supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
   };
   if (isLoading) {
     return <Spinner position="absolute" top="50%" left="50%" color="#B08EA2" />; // TODO : Put this in a better place (instead of form maybe...)

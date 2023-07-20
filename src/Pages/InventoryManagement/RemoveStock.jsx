@@ -18,14 +18,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  getFirestore,
-  updateDoc,
-} from "firebase/firestore";
+import useSWR from "swr";
 import { useEffect, useState } from "react";
 import {
   useCollection,
