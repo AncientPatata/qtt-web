@@ -5,18 +5,12 @@ async function AddNewItem({ itemName, unitPrice, ...other }) {
     .from("Items")
     .insert({
       item_name: itemName,
-      unit_price: unitPrice,
+      unit_price: 0,
     })
     .select();
 }
 
 async function InstanciateItems(itemId, quantity, lot, expDate) {
-  console.log({
-    p_item_type: 1,
-    p_lot: lot,
-    p_expDate: new Date().toISOString(),
-    p_quantity: quantity,
-  });
   let { data: preexisting_item, error } = await supabase
     .from("ItemInstances")
     .select("*")
@@ -49,20 +43,41 @@ async function InstanciateItems(itemId, quantity, lot, expDate) {
   //p_item_name text, p_lot text, p_expDate timestamp, p_quantity int2)
   return data;
 }
+// Show some sort of status message on delete
+// Handle errors in case it all goes fucky wucky to micro update parts of the elements except the ones that failed
+async function RemoveItemInstanceQuantities(itemId, updatedValues) {
+  await updatedValues.forEach(async (element) => {
+    if (element.quantity !== element.new_quantity) {
+      if (element.new_quantity === 0) {
+        await supabase
+          .from("ItemInstances")
+          .delete()
+          .eq("item_type", itemId)
+          .eq("lot", element.lot)
+          .eq("expDate", element.expDate)
+          .then(({ data: new_data, error }) => {
+            console.log(
+              "remove_item_instance_quantities_delete_error : ",
+              error
+            );
+          });
+      } else {
+        await supabase
+          .from("ItemInstances")
+          .update({ quantity: element.new_quantity })
+          .eq("item_type", itemId)
+          .eq("lot", element.lot)
+          .eq("expDate", element.expDate)
+          .eq("expDate", element.expDate)
+          .then(({ data: new_data, error }) => {
+            console.log(
+              "remove_item_instance_quantities_update_error : ",
+              error
+            );
+          });
+      }
+    }
+  });
+}
 
-async function ApplyQuantityModifToLot(
-  itemId,
-  old_quantity,
-  new_quantity,
-  lot,
-  expDate
-) {}
-
-async function ApplyQuantityModifToItem(
-  itemId,
-  old_quantity,
-  new_quantity,
-  expDate
-) {}
-
-export { InstanciateItems, ApplyQuantityModifToLot, AddNewItem };
+export { InstanciateItems, RemoveItemInstanceQuantities, AddNewItem };

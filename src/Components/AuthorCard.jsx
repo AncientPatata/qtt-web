@@ -30,7 +30,7 @@ function AuthorCard() {
               >
                 Manage inventory items
               </Box>
-              <Box
+              {/* <Box
                 fontSize="xl"
                 fontWeight="medium"
                 color="#FFFFEE"
@@ -42,8 +42,8 @@ function AuthorCard() {
                 align="center"
               >
                 Add new user to context
-              </Box>
-              <Box
+              </Box> */}
+              {/* <Box
                 fontSize="xl"
                 fontWeight="medium"
                 color="#FFFFEE"
@@ -55,7 +55,7 @@ function AuthorCard() {
                 align="center"
               >
                 Regenerate UPIN
-              </Box>
+              </Box> */}
               <Box
                 fontSize="xl"
                 fontWeight="medium"
@@ -65,6 +65,7 @@ function AuthorCard() {
                 pr="25px"
                 bgColor="blackAlpha.100"
                 _hover={{ bgColor: "blackAlpha.300", cursor: "pointer" }}
+                onClick={() => navigate("/snapshots/history")}
                 align="center"
               >
                 Author PDF Reports

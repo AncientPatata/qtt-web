@@ -65,6 +65,7 @@ function Dashboard() {
       </Flex>
       <Flex
         margin="auto"
+        justifyContent="center"
         padding="25px"
         flexWrap="wrap"
         flexDir="row"

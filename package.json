@@ -17,6 +17,8 @@
     "chakra-react-select": "^4.6.0",
     "firebase": "^10.0.0",
     "framer-motion": "^10.12.22",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.31",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
@@ -50,5 +52,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "supabase": "^1.77.9",
+    "@babel/plugin-proposal-private-property-in-object": "~7.21.11"
   }
 }

@@ -14,12 +14,14 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  useToast,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { AddNewItem } from "../../lib/item_management";
 import useSWR from "swr";
 function CreateItemForm(props) {
   const { mutate } = useSWR("Items");
+  const toast = useToast();
   const {
     register,
     handleSubmit,
@@ -27,9 +29,30 @@ function CreateItemForm(props) {
     formState: { errors },
   } = useForm();
   const onSubmit = (data) => {
-    mutate(AddNewItem(data), {
-      optimisticData: (currData) => [data, ...currData],
-    });
+    mutate(
+      AddNewItem(data).then(({ data: new_data, err }) => {
+        if (err) {
+          toast({
+            title: "Item creation failed.",
+            description: `Failed to add the item ${data["itemName"]}, please try again`,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Item created.",
+            description: `Successfully added ${data["itemName"]} !`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      }),
+      {
+        optimisticData: (currData) => [data, ...currData],
+      }
+    );
   };
 
   return (
@@ -39,29 +62,6 @@ function CreateItemForm(props) {
           <FormControl>
             <FormLabel>Item name</FormLabel>
             <Input {...register("itemName", { required: true })} />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Unit price of item</FormLabel>
-            <InputGroup>
-              <Input
-                {...register("unitPrice", {
-                  valueAsNumber: true,
-                  pattern: {
-                    value: /^(0|[1-9]\d*)(\.\d+)?$/,
-                  },
-                })}
-              />
-              <InputRightElement
-                pointerEvents="none"
-                color="gray.300"
-                fontSize="1.2em"
-                children="DH"
-              />
-            </InputGroup>
-          </FormControl>
-          <FormControl>
-            <FormLabel>Extra information</FormLabel>
-            <Input {...register("extras")} />
           </FormControl>
         </Flex>
       </form>

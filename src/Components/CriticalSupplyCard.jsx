@@ -3,7 +3,7 @@ import { Box, Flex, Center } from "@chakra-ui/react";
 function CriticalSupplyCard() {
   return (
     <Box height="100%" pt="10px">
-      <Flex flexDir="column" height="100%">
+      <Flex flexDir="column" height="300px">
         <Box
           rounded="3xl"
           height="100%"
@@ -11,9 +11,32 @@ function CriticalSupplyCard() {
           borderRadius="3xl"
           borderBottomRadius="none"
           mb="12px"
-          _hover={{ borderWidth: "4px", borderColor: "#3581B8" }}
         >
-          TODO
+          <Flex flexDir="column" height="100%">
+            <Box
+              width="100%"
+              height="100px"
+              bg="rgba(255, 255, 255, 0.27)"
+              roundedTop="3xl"
+              borderRadius="16px"
+              boxShadow={"0 4px 30px rgba(0, 0, 0, 0.1)"}
+              backdropFilter={"blur(3px)"}
+              style={{ WebkitBackdropFilter: "blur(3px)" }}
+              border="1px solid rgba(255, 255, 255, 0.3)"
+            >
+              <Flex flexDir="column" height="100%" p="13px">
+                <Box fontSize="2xl" fontFamily="'Roboto'">
+                  Item name
+                </Box>
+                <Box fontSize="sm" fontFamily="'Roboto'">
+                  Item LOT
+                </Box>
+                <Box textAlign="right" fontWeight="bold" fontFamily="'Roboto'">
+                  2 Days left
+                </Box>
+              </Flex>
+            </Box>
+          </Flex>
         </Box>
         <Box
           rounded="3xl"
@@ -33,7 +56,7 @@ function CriticalSupplyCard() {
             fontFamily="heading"
             fontWeight="200"
           >
-            Items in critical supply
+            Items close to expiration date
           </Center>
         </Box>
       </Flex>

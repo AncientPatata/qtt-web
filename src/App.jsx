@@ -16,6 +16,8 @@ import AuthorItems from "./Pages/InventoryManagement/AuthorItems";
 import NewStock from "./Pages/InventoryManagement/NewStock";
 import { useAuthState } from "react-firebase-hooks/auth";
 import RemoveStock from "./Pages/InventoryManagement/RemoveStock";
+import Debug from "./Pages/Debug";
+import DocGenHistory from "./Pages/Documents/GenHistory";
 const dashboardRouter = createBrowserRouter([
   {
     path: "/",
@@ -32,6 +34,14 @@ const dashboardRouter = createBrowserRouter([
   {
     path: "/inventory/remove_stock",
     element: <RemoveStock />,
+  },
+  {
+    path: "/snapshots/history",
+    element: <DocGenHistory />,
+  },
+  {
+    path: "/debug",
+    element: <Debug />,
   },
 ]);
 
