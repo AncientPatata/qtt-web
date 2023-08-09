@@ -12,7 +12,7 @@ function CriticalSupplyCard() {
           borderBottomRadius="none"
           mb="12px"
         >
-          <Flex flexDir="column" height="100%">
+          {/* <Flex flexDir="column" height="100%">
             <Box
               width="100%"
               height="100px"
@@ -25,18 +25,19 @@ function CriticalSupplyCard() {
               border="1px solid rgba(255, 255, 255, 0.3)"
             >
               <Flex flexDir="column" height="100%" p="13px">
-                <Box fontSize="2xl" fontFamily="'Roboto'">
+                <Box fontSize="2xl" fontFamily="body">
                   Item name
                 </Box>
-                <Box fontSize="sm" fontFamily="'Roboto'">
+                <Box fontSize="sm" fontFamily="body">
                   Item LOT
                 </Box>
-                <Box textAlign="right" fontWeight="bold" fontFamily="'Roboto'">
+                <Box textAlign="right" fontWeight="bold" fontFamily="body">
                   2 Days left
                 </Box>
               </Flex>
             </Box>
-          </Flex>
+          </Flex> */}
+          <Center height="100%">Nothing to show here..</Center>
         </Box>
         <Box
           rounded="3xl"

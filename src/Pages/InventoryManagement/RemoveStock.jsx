@@ -304,7 +304,7 @@ function RemoveStock() {
             align="center"
             justifyContent="center"
             fontSize="xl"
-            fontFamily="'Roboto'"
+            fontFamily="body"
             onClick={() => navigate("/")}
             _hover={{ cursor: "pointer", bgColor: "#F7AEF8", color: "black" }}
           >
